@@ -146,37 +146,10 @@ openclaw plugins list
 - `.github/workflows/ci.yml` 持续集成
 - `scripts/release.sh` 一键发布脚本
 
-安装依赖与测试：
 
-```bash
-pnpm install
-pnpm check
-```
 
-发布到 npm：
 
-```bash
-npm login
-pnpm release
-```
 
-如果你已经在 CI 里跑过测试，想跳过本地测试：
 
-```bash
-SKIP_TESTS=1 pnpm release
-```
 
-## 8) 一键导出为独立 Git 仓库
 
-本目录已内置两个脚本：
-
-```bash
-# 仅本地初始化（git init + 首次 commit）
-./scripts/init-standalone-local.sh
-
-# 初始化并绑定 GitHub 远端（可选 --push 直接推送）
-./scripts/init-standalone-with-remote.sh git@github.com:<you>/<repo>.git main
-./scripts/init-standalone-with-remote.sh git@github.com:<you>/<repo>.git main --push
-```
-
-如果你已经在别处 `git init` 过，第二个脚本会复用已有仓库，只更新 `origin`。

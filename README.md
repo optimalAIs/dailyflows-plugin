@@ -146,37 +146,11 @@ Recommended structure (already included):
 - `.github/workflows/ci.yml` CI workflow
 - `scripts/release.sh` one-command publish script
 
-Install and verify:
 
-```bash
-pnpm install
-pnpm check
 ```
 
-Publish to npm:
 
-```bash
-npm login
-pnpm release
 ```
 
-If CI already validated and you want to skip local tests:
 
-```bash
-SKIP_TESTS=1 pnpm release
-```
 
-## 8) One-click export as standalone Git repo
-
-This directory includes two helper scripts:
-
-```bash
-# Local-only init (git init + first commit)
-./scripts/init-standalone-local.sh
-
-# Init and attach GitHub remote (optional --push)
-./scripts/init-standalone-with-remote.sh git@github.com:<you>/<repo>.git main
-./scripts/init-standalone-with-remote.sh git@github.com:<you>/<repo>.git main --push
-```
-
-If you already ran `git init` elsewhere, the second script reuses the existing repository and only updates `origin`.
