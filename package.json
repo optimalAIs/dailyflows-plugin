@@ -1,0 +1,67 @@
+{
+  "name": "@dailyflows-openclaw/dailyflows",
+  "version": "0.1.0",
+  "description": "Dailyflows webhook channel plugin for OpenClaw",
+  "license": "MIT",
+  "type": "module",
+  "main": "index.ts",
+  "packageManager": "pnpm@8.14.3",
+  "keywords": [
+    "openclaw",
+    "dailyflows",
+    "plugin",
+    "channel",
+    "webhook"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "files": [
+    "index.ts",
+    "openclaw.plugin.json",
+    "src/**",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "qrcode-terminal": "^0.12.0"
+  },
+  "peerDependencies": {
+    "openclaw": ">=2026.2.1"
+  },
+  "devDependencies": {
+    "openclaw": "^2026.2.1",
+    "vitest": "^4.0.18"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "pack:check": "npm pack --dry-run",
+    "check": "pnpm test && pnpm pack:check",
+    "release": "bash ./scripts/release.sh"
+  },
+  "openclaw": {
+    "extensions": [
+      "./index.ts"
+    ],
+    "channel": {
+      "id": "dailyflows",
+      "label": "Dailyflows",
+      "selectionLabel": "Dailyflows (Webhook)",
+      "docsPath": "/channels/dailyflows",
+      "docsLabel": "dailyflows",
+      "blurb": "Dailyflows webhook channel.",
+      "order": 90,
+      "aliases": [
+        "dailyflow"
+      ]
+    },
+    "install": {
+      "npmSpec": "@dailyflows-openclaw/dailyflows",
+      "defaultChoice": "npm"
+    }
+  }
+}
