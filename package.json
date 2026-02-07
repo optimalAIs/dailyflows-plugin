@@ -1,6 +1,6 @@
 {
-  "name": "@dailyflows/dailyflows",
-  "version": "1.0",
+  "name": "@dailyflows/openclaw-dailyflows",
+  "version": "1.0.0",
   "description": "Dailyflows webhook channel plugin for OpenClaw",
   "license": "MIT",
   "type": "module",
@@ -62,7 +62,7 @@
       ]
     },
     "install": {
-      "npmSpec": "@dailyflows/dailyflows",
+      "npmSpec": "@dailyflows/openclaw-dailyflows",
       "defaultChoice": "npm"
     }
   }
