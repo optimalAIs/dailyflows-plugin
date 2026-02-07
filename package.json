@@ -21,6 +21,7 @@
     "openclaw.plugin.json",
     "src/**",
     "README.md",
+    "README.zh-CN.md",
     "LICENSE"
   ],
   "publishConfig": {
