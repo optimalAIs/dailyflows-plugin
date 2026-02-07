@@ -2,7 +2,7 @@
 
 英文版文档请见 [README.md](./README.md)。
 
-这个目录可以直接独立成一个开源仓库（例如 `dailyflows-openclaw-plugin`），只维护插件，不需要维护整份 OpenClaw fork。
+这个目录可以直接独立成一个开源仓库（例如 `dailyflows-plugin`），只维护插件，不需要维护整份 OpenClaw fork。
 
 ## 1) 用户侧：安装 OpenClaw（官方）
 
@@ -30,7 +30,7 @@ openclaw gateway status
 ### 方式 A：npm 安装（推荐）
 
 ```bash
-openclaw plugins install @dailyflows-openclaw/dailyflows
+openclaw plugins install @dailyflows/dailyflows
 openclaw gateway restart
 ```
 

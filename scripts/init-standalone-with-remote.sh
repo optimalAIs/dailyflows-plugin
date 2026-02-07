@@ -7,8 +7,8 @@ usage() {
   scripts/init-standalone-with-remote.sh <remote-url> [branch] [--push]
 
 示例:
-  scripts/init-standalone-with-remote.sh git@github.com:yourname/dailyflows-openclaw-plugin.git
-  scripts/init-standalone-with-remote.sh https://github.com/yourname/dailyflows-openclaw-plugin.git main --push
+  scripts/init-standalone-with-remote.sh git@github.com:yourname/dailyflows-plugin.git
+  scripts/init-standalone-with-remote.sh https://github.com/yourname/dailyflows-plugin.git main --push
 USAGE
 }
 

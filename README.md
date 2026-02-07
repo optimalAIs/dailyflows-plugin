@@ -1,6 +1,6 @@
 # Dailyflows Plugin for OpenClaw
 
-This directory is designed to be maintained as a standalone open-source repository (for example `dailyflows-openclaw-plugin`). You can maintain only the plugin without maintaining a full OpenClaw fork.
+This directory is designed to be maintained as a standalone open-source repository (for example `dailyflows-plugin`). You can maintain only the plugin without maintaining a full OpenClaw fork.
 
 For Chinese documentation, see [README.zh-CN.md](./README.zh-CN.md).
 
@@ -30,7 +30,7 @@ If you see `Runtime: running` + `RPC probe: ok`, your Gateway is healthy.
 ### Option A: Install from npm (recommended)
 
 ```bash
-openclaw plugins install @dailyflows-openclaw/dailyflows
+openclaw plugins install @dailyflows/dailyflows
 openclaw gateway restart
 ```
 
