@@ -49,12 +49,24 @@ export type DailyflowsOutboundAttachment = {
   durationMs?: number;
 };
 
+export type DailyFlowsToolCall = {
+  name: string;
+  call_id: string;
+  args: Record<string, any>;
+};
+
+export type DailyFlowsAction = {
+  type: "tool_call";
+  tool: DailyFlowsToolCall;
+};
+
 export type DailyflowsOutboundPayload = {
   accountId: string;
   conversationId: string;
   messageId?: string;
   text?: string;
   replyToId?: string;
+  actions?: DailyFlowsAction[];
   attachments?: DailyflowsOutboundAttachment[];
 };
 

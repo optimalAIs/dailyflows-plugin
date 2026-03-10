@@ -79,6 +79,16 @@ export DAILYFLOWS_WEBHOOK_SECRET_DEFAULT="replace-with-random"
 
 The Dailyflows cloud must call back into your Gateway, so you need a public HTTPS URL (Tailscale Funnel is a common choice).
 
+Install tailscale:
+
+```bash
+brew install tailscale # Install tailscale daemon
+sudo tailscaled # Start tailscale daemon
+tailscale up # Login to tailscale
+tailscale funnel PORT_NUMBER # Expose openclaw local port number to tailscale
+tailscale status # Check the funnel URL
+```
+
 Example:
 
 ```bash

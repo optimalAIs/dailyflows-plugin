@@ -2,7 +2,23 @@ import type { OpenClawConfig } from "openclaw/plugin-sdk";
 
 import { sendDailyflowsMessage } from "./send.js";
 import { getDailyflowsRuntime } from "./runtime.js";
-import type { DailyflowsInboundMessage, DailyflowsWebhookPayload } from "./types.js";
+import type { DailyflowsInboundMessage, DailyflowsWebhookPayload, DailyFlowsAction } from "./types.js";
+
+function extractDailyFlowsActions(text: string): { cleanText: string; actions: DailyFlowsAction[] } {
+  const actions: DailyFlowsAction[] = [];
+  const cleanText = text.replace(/```dailyflows-action\n([\s\S]*?)```/g, (_match, json: string) => {
+    try {
+      const parsed = JSON.parse(json.trim());
+      if (parsed && parsed.type === "tool_call" && parsed.tool) {
+        actions.push(parsed as DailyFlowsAction);
+      }
+    } catch {
+      // skip malformed blocks
+    }
+    return "";
+  }).trim();
+  return { cleanText, actions };
+}
 
 function formatInboundBody(message: DailyflowsInboundMessage): string {
   const text = message.text?.trim() ?? "";
@@ -102,13 +118,15 @@ export async function handleDailyflowsInbound(params: {
     cfg,
     dispatcherOptions: {
       deliver: async (reply) => {
+        const { cleanText, actions } = extractDailyFlowsActions(reply.text ?? "");
         await sendDailyflowsMessage({
           cfg,
           payload: {
             accountId,
             conversationId,
-            text: reply.text ?? "",
+            text: cleanText,
             replyToId: message.messageId,
+            actions: actions.length ? actions : undefined,
             attachments: reply.mediaUrls?.length
               ? reply.mediaUrls.map((url) => ({ type: "file", url }))
               : reply.mediaUrl
