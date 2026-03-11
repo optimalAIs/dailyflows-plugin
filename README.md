@@ -30,7 +30,7 @@ If you see `Runtime: running` + `RPC probe: ok`, your Gateway is healthy.
 ### Option A: Install from npm (recommended)
 
 ```bash
-openclaw plugins install @dailyflows/openclaw-dailyflows@1.0.2
+openclaw plugins install @dailyflows/openclaw-dailyflows@latest
 openclaw gateway restart
 ```
 
@@ -43,39 +43,8 @@ openclaw gateway restart
 
 > You usually install the plugin only once. Reinstall only when you switch machines/profiles or reset config.
 
-## 3) Minimal config
 
-```json5
-{
-  channels: {
-    dailyflows: {
-      webhookPath: "/dailyflows/webhook",
-      accounts: {
-        default: {
-          enabled: true,
-          outboundUrl: "https://dailyflows.example.com/openclaw/outbound",
-          outboundToken: "REPLACE_ME"
-        }
-      }
-    }
-  },
-  plugins: {
-    entries: {
-      dailyflows: { enabled: true }
-    }
-  }
-}
-```
-
-Use environment variables for webhook secrets:
-
-```bash
-export DAILYFLOWS_WEBHOOK_SECRET="replace-with-random"
-# Optional: per-account override
-export DAILYFLOWS_WEBHOOK_SECRET_DEFAULT="replace-with-random"
-```
-
-## 4) Pair Dailyflows App with OpenClaw
+## 3) Pair Dailyflows App with OpenClaw
 
 Dailyflows cloud needs to call back to your Gateway, so you need a public HTTPS URL (Tailscale Funnel is a common choice).
 
@@ -107,13 +76,10 @@ openclaw config set gateway.tailscale.mode funnel
 # Fix CORS error: Allow Tailscale domain
 openclaw config set gateway.controlUi.allowedOrigins '["https://<your-machine-name>.ts.net"]'
 
-# Fix device pairing: Allow insecure auth (recommended) or manually approve
-openclaw config set gateway.controlUi.allowInsecureAuth true
-```
+# Fix device pairing: Allow insecure auth 
+#openclaw config set gateway.controlUi.allowInsecureAuth true
 
-### 4.4 Device Pairing Management (New)
-
-```bash
+# Or fix device pairing: manually approve(recommended)
 # List pending and paired devices
 openclaw devices list
 
@@ -127,14 +93,14 @@ openclaw devices approve --latest
 openclaw devices list
 ```
 
-### 4.5 Start and Verify
+### 4.4 Start and Verify
 
 ```bash
 openclaw gateway restart
 openclaw status                         # Confirm Gateway: online
 ```
 
-### 4.6 Troubleshooting
+### 4.5 Troubleshooting
 
 | Issue | Cause | Solution |
 |-------|-------|----------|
@@ -143,7 +109,7 @@ openclaw status                         # Confirm Gateway: online
 | **pairing required** | Device not paired | `openclaw devices list` → `openclaw devices approve <id>`<br>or `gateway.controlUi.allowInsecureAuth true` |
 | **Tailscale URL valid but offline** | WebSocket forwarding issue | Use Tailscale IP directly: `mode=off + bind=tailnet` |
 
-### 4.7 Verification & Access
+### 4.6 Verification & Access
 
 **Access Methods**:
 
@@ -162,7 +128,7 @@ tailscale status                         # Tailscale connection
 openclaw devices list                    # List authorized devices
 ```
 
-### 4.8 Fallback Plan (Most Stable)
+### 4.7 Fallback Plan (Most Stable)
 
 If Funnel fails, use this pure Tailnet solution:
 
@@ -173,7 +139,7 @@ openclaw gateway restart
 ```
 Access via: `http://<tailscale-ip>:18789/`
 
-### 4.9 Pairing Flow (Final Step)
+### 4.8 Pairing Flow (Final Step)
 
 After configuration:
 
