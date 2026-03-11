@@ -30,7 +30,7 @@ If you see `Runtime: running` + `RPC probe: ok`, your Gateway is healthy.
 ### Option A: Install from npm (recommended)
 
 ```bash
-openclaw plugins install @dailyflows/dailyflows
+openclaw plugins install @dailyflows/openclaw-dailyflows@1.0.2
 openclaw gateway restart
 ```
 
@@ -77,36 +77,111 @@ export DAILYFLOWS_WEBHOOK_SECRET_DEFAULT="replace-with-random"
 
 ## 4) Pair Dailyflows App with OpenClaw
 
-The Dailyflows cloud must call back into your Gateway, so you need a public HTTPS URL (Tailscale Funnel is a common choice).
+Dailyflows cloud needs to call back to your Gateway, so you need a public HTTPS URL (Tailscale Funnel is a common choice).
 
-Install tailscale:
+### 4.1 Tailscale Setup
 
 ```bash
-brew install tailscale # Install tailscale daemon
-sudo tailscaled # Start tailscale daemon
-tailscale up # Login to tailscale
-tailscale funnel PORT_NUMBER # Expose openclaw local port number to tailscale
-tailscale status # Check the funnel URL
+brew install tailscale                    # Install
+sudo tailscaled                          # Start daemon
+tailscale up                             # Login to tailnet
+tailscale status                         # Check online status and note Tailscale IP
 ```
 
-Example:
+### 4.2 OpenClaw Gateway Basic Configuration
 
 ```bash
+# Local secure mode + password
 openclaw config set gateway.mode local
 openclaw config set gateway.bind loopback
 openclaw config set gateway.auth.mode password
 openclaw config set gateway.auth.password "<strong-password>"
+
+# Tailscale Funnel mode
 openclaw config set gateway.tailscale.mode funnel
-openclaw gateway restart
 ```
 
-Pairing flow:
+### 4.3 Critical Security Configuration (Remote Access)
+
+```bash
+# Fix CORS error: Allow Tailscale domain
+openclaw config set gateway.controlUi.allowedOrigins '["https://<your-machine-name>.ts.net"]'
+
+# Fix device pairing: Allow insecure auth (recommended) or manually approve
+openclaw config set gateway.controlUi.allowInsecureAuth true
+```
+
+### 4.4 Device Pairing Management (New)
+
+```bash
+# List pending and paired devices
+openclaw devices list
+
+# Approve a specific device (using request ID from above)
+openclaw devices approve <request-id>
+
+# Or approve the latest request
+openclaw devices approve --latest
+
+# Check approved devices list
+openclaw devices list
+```
+
+### 4.5 Start and Verify
+
+```bash
+openclaw gateway restart
+openclaw status                         # Confirm Gateway: online
+```
+
+### 4.6 Troubleshooting
+
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| **Gateway offline** | Gateway process issue | `openclaw gateway restart` |
+| **origin not allowed** | Missing CORS whitelist | Add Tailscale domain to `gateway.controlUi.allowedOrigins` |
+| **pairing required** | Device not paired | `openclaw devices list` → `openclaw devices approve <id>`<br>or `gateway.controlUi.allowInsecureAuth true` |
+| **Tailscale URL valid but offline** | WebSocket forwarding issue | Use Tailscale IP directly: `mode=off + bind=tailnet` |
+
+### 4.7 Verification & Access
+
+**Access Methods**:
+
+| Method | Address | Status |
+|--------|---------|--------|
+| **Local** | `http://127.0.0.1:18789/` | ✅ online |
+| **Tailnet LAN** | `http://<tailscale-ip>:18789/` | ✅ online |
+| **Tailscale Funnel** | `https://xxx.ts.net/` | ✅ online (after config) |
+
+**Verification Commands**:
+
+```bash
+openclaw status                          # Gateway status
+openclaw config get gateway.*            # Check config
+tailscale status                         # Tailscale connection
+openclaw devices list                    # List authorized devices
+```
+
+### 4.8 Fallback Plan (Most Stable)
+
+If Funnel fails, use this pure Tailnet solution:
+
+```bash
+openclaw config set gateway.tailscale.mode off
+openclaw config set gateway.bind tailnet
+openclaw gateway restart
+```
+Access via: `http://<tailscale-ip>:18789/`
+
+### 4.9 Pairing Flow (Final Step)
+
+After configuration:
 
 1. Open `https://<gateway-host>/dailyflows/pair`
 2. In Dailyflows App, go to `Voice Assistant -> OpenClaw`
 3. Scan the QR code
 
-You can also print the QR in CLI:
+You can also generate the QR code in the terminal:
 
 ```bash
 openclaw dailyflows pair --gateway-url https://<your-funnel-url>

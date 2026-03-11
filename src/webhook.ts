@@ -2,10 +2,7 @@ import type { IncomingMessage, ServerResponse } from "node:http";
 
 import type { OpenClawPluginApi } from "openclaw/plugin-sdk";
 
-import {
-  resolveDailyflowsWebhookPath,
-  resolveDailyflowsWebhookSecret,
-} from "./config.js";
+import { resolveDailyflowsWebhookSecret } from "./config.js";
 import { handleDailyflowsInbound } from "./inbound.js";
 import { isDailyflowsSignatureValid } from "./signature.js";
 import type { DailyflowsWebhookPayload } from "./types.js";
@@ -34,17 +31,12 @@ function parseJson(body: string): DailyflowsWebhookPayload | null {
 }
 
 export function createDailyflowsWebhookHandler(api: OpenClawPluginApi) {
-  return async (req: IncomingMessage, res: ServerResponse): Promise<boolean> => {
-    const url = new URL(req.url ?? "/", "http://localhost");
+  return async (req: IncomingMessage, res: ServerResponse) => {
     const cfg = api.runtime.config.loadConfig();
-    const expectedPath = resolveDailyflowsWebhookPath(cfg);
-    if (url.pathname !== expectedPath) {
-      return false;
-    }
     if (req.method !== "POST") {
       res.statusCode = 405;
       res.end();
-      return true;
+      return;
     }
 
     const timestamp = String(req.headers["x-dailyflows-timestamp"] ?? "").trim();
@@ -54,19 +46,19 @@ export function createDailyflowsWebhookHandler(api: OpenClawPluginApi) {
     if (!timestamp || !signature) {
       res.statusCode = 400;
       res.end("missing signature headers");
-      return true;
+      return;
     }
 
     const parsedTimestamp = Number.parseInt(timestamp, 10);
     if (!Number.isFinite(parsedTimestamp)) {
       res.statusCode = 400;
       res.end("invalid timestamp");
-      return true;
+      return;
     }
     if (Math.abs(Date.now() - parsedTimestamp) > MAX_SKEW_MS) {
       res.statusCode = 401;
       res.end("stale timestamp");
-      return true;
+      return;
     }
 
     const body = await readBody(req);
@@ -74,12 +66,12 @@ export function createDailyflowsWebhookHandler(api: OpenClawPluginApi) {
     if (!payload) {
       res.statusCode = 400;
       res.end("invalid payload");
-      return true;
+      return;
     }
     if (eventType && eventType !== payload.type) {
       res.statusCode = 400;
       res.end("event mismatch");
-      return true;
+      return;
     }
 
     const secret = resolveDailyflowsWebhookSecret({
@@ -89,12 +81,12 @@ export function createDailyflowsWebhookHandler(api: OpenClawPluginApi) {
     if (!secret) {
       res.statusCode = 401;
       res.end("webhook secret not configured");
-      return true;
+      return;
     }
     if (!isDailyflowsSignatureValid({ secret, timestamp, signature, body })) {
       res.statusCode = 401;
       res.end("invalid signature");
-      return true;
+      return;
     }
 
     res.statusCode = 200;
@@ -109,6 +101,5 @@ export function createDailyflowsWebhookHandler(api: OpenClawPluginApi) {
     } catch (err) {
       api.logger.error(`dailyflows webhook handler failed: ${String(err)}`);
     }
-    return true;
   };
 }

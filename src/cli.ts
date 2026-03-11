@@ -14,6 +14,18 @@ function resolveLocalGatewayUrl(config: OpenClawConfig, override?: string) {
   return `http://127.0.0.1:${port}`;
 }
 
+function buildGatewayAuthHeaders(config: OpenClawConfig) {
+  const mode = config.gateway?.auth?.mode;
+  const token = config.gateway?.auth?.token;
+  const password = config.gateway?.auth?.password;
+  const headers = new Headers();
+  const bearer = mode === "password" ? password : token;
+  if (bearer) {
+    headers.set("Authorization", `Bearer ${String(bearer)}`);
+  }
+  return headers;
+}
+
 export function registerDailyflowsCli(params: {
   program: Command;
   config: OpenClawConfig;
@@ -44,12 +56,16 @@ export function registerDailyflowsCli(params: {
       pairingUrl.searchParams.set("accountId", options.account);
       pairingUrl.searchParams.set("format", "json");
 
-      const res = await fetch(pairingUrl.toString());
+      const res = await fetch(pairingUrl.toString(), {
+        headers: buildGatewayAuthHeaders(config),
+      });
+      const bodyText = await res.text();
       if (!res.ok) {
-        const text = await res.text();
-        throw new Error(`Gateway pairing endpoint failed: ${res.status} ${res.statusText} ${text}`);
+        throw new Error(
+          `Gateway pairing endpoint failed: ${res.status} ${res.statusText} ${bodyText}`,
+        );
       }
-      const payload = (await res.json()) as {
+      let payload: {
         ok?: boolean;
         error?: string;
         gatewayUrl?: string;
@@ -58,6 +74,22 @@ export function registerDailyflowsCli(params: {
         payload?: string;
         expiresAt?: number;
       };
+      try {
+        payload = JSON.parse(bodyText) as {
+          ok?: boolean;
+          error?: string;
+          gatewayUrl?: string;
+          accountId?: string;
+          pairCode?: string;
+          payload?: string;
+          expiresAt?: number;
+        };
+      } catch {
+        const compact = bodyText.replace(/\s+/g, " ").slice(0, 200);
+        throw new Error(
+          `Gateway pairing endpoint returned non-JSON response. URL=${pairingUrl.toString()} body=${compact}. Please ensure gateway is running and restart it to reload plugin routes.`,
+        );
+      }
 
       if (!payload.ok || !payload.payload) {
         throw new Error(payload.error || "Failed to generate pairing payload");
