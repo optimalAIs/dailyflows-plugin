@@ -24,12 +24,12 @@ const plugin = {
     } as any);
     api.registerHttpRoute({
       path: "/dailyflows/pair",
-      auth: "none",
+      auth: "plugin",
       handler: createDailyflowsPairingRoute(api),
     } as any);
     api.registerHttpRoute({
       path: "/dailyflows/unpair",
-      auth: "gateway",
+      auth: "plugin",
       handler: createDailyflowsUnpairRoute(api),
     } as any);
     api.registerCli(({ program, config }) => registerDailyflowsCli({ program, config }), {

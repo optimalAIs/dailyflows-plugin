@@ -30,7 +30,7 @@ openclaw gateway status
 ### 方式 A：npm 安装（推荐）
 
 ```bash
-openclaw plugins install @dailyflows/openclaw-dailyflows@1.0.0
+openclaw plugins install @dailyflows/openclaw-dailyflows@latest
 openclaw gateway restart
 ```
 
@@ -43,39 +43,8 @@ openclaw gateway restart
 
 > 插件一般只安装一次。除非换机器、清理配置、切 profile，平时不需要重复安装。
 
-## 3) 用户侧：最小配置
 
-```json5
-{
-  channels: {
-    dailyflows: {
-      webhookPath: "/dailyflows/webhook",
-      accounts: {
-        default: {
-          enabled: true,
-          outboundUrl: "https://dailyflows.example.com/openclaw/outbound",
-          outboundToken: "REPLACE_ME"
-        }
-      }
-    }
-  },
-  plugins: {
-    entries: {
-      dailyflows: { enabled: true }
-    }
-  }
-}
-```
-
-建议用环境变量配置 webhook secret：
-
-```bash
-export DAILYFLOWS_WEBHOOK_SECRET="replace-with-random"
-# 可选，按 accountId 覆盖
-export DAILYFLOWS_WEBHOOK_SECRET_DEFAULT="replace-with-random"
-```
-
-## 4) 用户侧：扫码绑定（Dailyflows App -> OpenClaw）
+## 3) 用户侧：扫码绑定（Dailyflows App -> OpenClaw）
 
 Dailyflows 云端需要回调你的 Gateway，所以要有公网 HTTPS 地址（常见方案：Tailscale Funnel）。
 
